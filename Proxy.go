@@ -53,7 +53,8 @@ func (p *Proxy) ServeHTTP(wr http.ResponseWriter, r *http.Request) {
 	for name, values := range r.Header {
 		log.Printf("%v=%v", name, values)
 		for _, value := range values {
-			req.Header.Set(name, value)
+			// req.Header.Set(name, value)
+			req.Header.Add(name, value)
 		}
 	}
 	//rep.Host = r.Host
@@ -69,7 +70,9 @@ func (p *Proxy) ServeHTTP(wr http.ResponseWriter, r *http.Request) {
 	conn := &HttpConnection{r, resp}
 
 	for k, v := range resp.Header {
-		wr.Header().Set(k, v[0])
+		for _, val := range v {
+			wr.Header().Add(k, val)
+		}
 	}
 	wr.WriteHeader(resp.StatusCode)
 	io.Copy(wr, resp.Body)
